@@ -13,31 +13,31 @@ app.post("/sign-up", (req, res) => {
   const { username, avatar } = req.body;
 
   if (username !== "" && avatar !== "") {
-    res.status(400).send("Todos os campos são obrigatórios!");
+    users.push({ username: username, avatar: avatar });
+    res.status(201).send("OK");
     return;
   }
-
-  users.push({ username: username, avatar: avatar });
-  res.status(201).send("OK");
+  res.status(400).send("Todos os campos são obrigatórios!");
 });
 
 app.post("/tweets", (req, res) => {
-  const { tweet } = req.body;
-  const { user: username } = req.headers;
+  const { tweet, username } = req.body;
+
+  const foundUser = users.find((user) => user.username === username);
 
   if (tweet !== "" && username !== undefined) {
-    const foundUser = users.find((u) => u.username == username);
-    if (foundUser === undefined) {
+    if (!foundUser) {
       res.status(401).send("Esse usuário não está cadastrado");
+      return;
     }
+
     const body = {
       username: username,
-      avatar: foundUser.avatar,
       tweet: tweet,
     };
+
     tweets.push(body);
     res.status(201).send("OK");
-    return;
   }
 
   res.status(400).send("Todos os campos são obrigatórios!");
