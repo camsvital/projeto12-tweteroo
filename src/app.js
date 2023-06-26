@@ -23,10 +23,10 @@ app.post("/sign-up", (req, res) => {
 app.post("/tweets", (req, res) => {
   const { tweet, username } = req.body;
 
-  const foundUser = users.find((u) => u.username === username);
+  const foundUser = users.find((user) => user.username === username);
 
   if (!foundUser) {
-    res.status(401).send("Usuário não cadastrado");
+    res.status(401).send("Esse usuário não está cadastrado");
     return;
   }
 
@@ -40,28 +40,39 @@ app.post("/tweets", (req, res) => {
 });
 
 app.get("/tweets", (req, res) => {
-  let userTweets = tweets
-    .slice(-10)
-    .reverse()
-    .map((tweet) => {
-      const user = users.find((u) => u.username === tweet.username);
-      if (u) {
-        return {
-          ...tweet,
-          avatar: user.avatar,
-        };
+  const {page} = req.query
+  const tweetSended = []
+  let counter = 0
+
+  console.log(page)
+
+  if (page !== undefined){
+      if(page > 0){
+          for(let i = (tweets.length - 1) - (page-1)*10; counter < 10 && i >= 0; i--){
+              tweetSended.push(tweets[i])
+              counter ++
+          }
+          res.status(200).send(tweetSended)
+          return
+      }else{
+          res.status(400).send("Informe uma página válida!")
+          return
       }
-      return tweet;
-    });
-
-  res.send(userTweets);
-});
-
+  }
+  
+  for(let i = tweets.length - 1; counter < 10 && i >= 0; i--){
+      tweetSended.push(tweets[i])
+      counter ++
+  }
+  res.status(200).send(tweetSended)
+  
+})
 
 app.get("/tweets/:username", (req, res) => {
   const { username } = req.params;
-  const userTweet = tweets.filter((t) => t.username === username);
+  const userTweet = tweets.filter(t => t.username.toLowerCase() == username.toLowerCase());
   res.status(200).send(userTweet);
 });
 
 app.listen(5000);
+
