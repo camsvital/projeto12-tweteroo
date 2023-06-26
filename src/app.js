@@ -10,27 +10,28 @@ const users = [];
 const tweets = [];
 
 app.post("/sign-up", (req, res) => {
-  const { user, avatar } = req.body;
+  const { username, avatar } = req.body;
 
-  if (user.username === "" && user.avatar === "") {
-    return res.status(400).send("Todos os campos são obrigatórios!");
+  if (username !== "" && avatar !== "") {
+    res.status(400).send("Todos os campos são obrigatórios!");
+    return;
   }
 
-  users.push(req.body);
+  users.push({ username: username, avatar: avatar });
   res.status(201).send("OK");
 });
 
 app.post("/tweets", (req, res) => {
   const { tweet } = req.body;
-  const { user } = req.headers;
+  const { user: username } = req.headers;
 
-  if (tweet !== "" && user !== undefined) {
-    const foundUser = users.find((u) => u.username == user);
+  if (tweet !== "" && username !== undefined) {
+    const foundUser = users.find((u) => u.username == username);
     if (foundUser === undefined) {
       res.status(401).send("Esse usuário não está cadastrado");
     }
     const body = {
-      username: user,
+      username: username,
       avatar: foundUser.avatar,
       tweet: tweet,
     };
@@ -55,12 +56,12 @@ app.get("/tweets", (req, res) => {
 
   const start = page * -10;
   const end = (page - 1) * -10;
-  res.send(tweets.slice(start, end).reverse());
+  res.send(tweetList.slice(start, end).reverse());
 });
 
 app.get("/tweets/:username", (req, res) => {
-  const { user } = req.params;
-  const userTweet = tweets.filter((t) => t.username === user);
+  const { username } = req.params;
+  const userTweet = tweets.filter((t) => t.username === username);
   res.status(200).send(userTweet.reverse());
 });
 
