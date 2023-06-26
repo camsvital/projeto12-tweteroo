@@ -56,13 +56,13 @@ app.get("/tweets", (req, res) => {
 
   const start = page * -10;
   const end = (page - 1) * -10;
-  res.send(tweetList.slice(start, end).reverse());
+  res.send(tweets.slice(start, end).reverse());
 });
 
 app.get("/tweets/:username", (req, res) => {
   const { username } = req.params;
   const userTweet = tweets.filter((t) => t.username === username);
-  res.status(200).send(userTweet.reverse());
+  res.status(200).send(userTweet);
 });
 
 app.listen(5000);
