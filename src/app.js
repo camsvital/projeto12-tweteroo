@@ -23,41 +23,40 @@ app.post("/sign-up", (req, res) => {
 app.post("/tweets", (req, res) => {
   const { tweet, username } = req.body;
 
-  const foundUser = users.find((user) => user.username === username);
+  const foundUser = users.find((u) => u.username === username);
 
-  if (tweet !== "" && username !== undefined) {
-    if (!foundUser) {
-      res.status(401).send("Esse usuário não está cadastrado");
-      return;
-    }
-
-    const body = {
-      username: username,
-      tweet: tweet,
-    };
-
-    tweets.push(body);
-    res.status(201).send("OK");
+  if (!foundUser) {
+    res.status(401).send("Usuário não cadastrado");
+    return;
   }
 
-  res.status(400).send("Todos os campos são obrigatórios!");
+  const body = {
+    username: username,
+    tweet: tweet,
+  };
+
+  tweets.push(body);
+  res.status(201).send("OK");
 });
 
 app.get("/tweets", (req, res) => {
-  const page = Number(req.query.page);
+  let userTweets = tweets
+    .slice(-10)
+    .reverse()
+    .map((tweet) => {
+      const user = users.find((u) => u.username === tweet.username);
+      if (u) {
+        return {
+          ...tweet,
+          avatar: user.avatar,
+        };
+      }
+      return tweet;
+    });
 
-  if (page <= 0) {
-    return res.status(400).send("Informe uma página válida!");
-  }
-
-  if (page === undefined || page === 1) {
-    return res.send(tweets.slice(-10).reverse());
-  }
-
-  const start = page * -10;
-  const end = (page - 1) * -10;
-  res.send(tweets.slice(start, end).reverse());
+  res.send(userTweets);
 });
+
 
 app.get("/tweets/:username", (req, res) => {
   const { username } = req.params;
