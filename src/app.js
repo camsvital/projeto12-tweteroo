@@ -21,7 +21,7 @@ app.post("/sign-up", (req, res) => {
 });
 
 app.post("/tweets", (req, res) => {
-  const { tweet, username } = req.body;
+  const { tweet, username, avatar } = req.body;
 
   const foundUser = users.find((user) => user.username === username);
 
@@ -33,6 +33,7 @@ app.post("/tweets", (req, res) => {
   const body = {
     username: username,
     tweet: tweet,
+    avatar: avatar
   };
 
   tweets.push(body);
